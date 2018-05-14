@@ -5,11 +5,7 @@
 
 
 const int WIDTH = 600, HEIGHT = 600;
-game mainGame(WIDTH, HEIGHT);
-
-void init(){
-    
-}
+Game mainGame(WIDTH, HEIGHT);
 
 void renderScene(){mainGame.renderScene();}
 void normalKeys(unsigned char key, int x, int y){mainGame.normalKeys(key, x, y);}
@@ -24,7 +20,7 @@ int main(int argc, char** argv) {
     glutInitWindowPosition(mainGame.getWidth()/5, mainGame.getHeight()/5);
     glutInitWindowSize(mainGame.getWidth(), mainGame.getHeight());
     glutCreateWindow("Territory Expansion Game");
-    init();
+    mainGame.init();
     
     // register callbacks
     glutDisplayFunc(renderScene);
