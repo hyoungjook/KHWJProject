@@ -1,8 +1,5 @@
 #include "game.hpp"
 
-<<<<<<< HEAD
-//github.com
-=======
 void game::renderScene(){
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
@@ -19,7 +16,6 @@ void game::renderScene(){
     
     glutSwapBuffers();
 }
->>>>>>> KHJ_Basic
 
 void game::normalKeys(unsigned char key, int x, int y){
     
