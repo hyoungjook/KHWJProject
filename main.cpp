@@ -1,33 +1,37 @@
 #include <iostream>
 #include <GLUT/glut.h>
 
-#define WIDTH 600
-#define HEIGHT 600
+#include "game.hpp"
+
+
+const int WIDTH = 600, HEIGHT = 600;
+game mainGame(WIDTH, HEIGHT);
 
 void init(){
     
 }
 
-void renderScene(){
-    // Clear Color and Depth Buffers
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    
-    // Draw Game
-    
-    glutSwapBuffers();
-}
+void renderScene(){mainGame.renderScene();}
+void normalKeys(unsigned char key, int x, int y){mainGame.normalKeys(key, x, y);}
+void specialKeys(int key, int x, int y){mainGame.specialKeys(key, x, y);}
+void idleFunc(){mainGame.idleFunc();}
+void reshapeFunc(int w, int h){mainGame.reshapeFunc(w, h);}
 
 int main(int argc, char** argv) {
     // init GLUT and create Window
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
-    glutInitWindowPosition(650, 300);
-    glutInitWindowSize(WIDTH, HEIGHT);
+    glutInitWindowPosition(mainGame.getWidth()/5, mainGame.getHeight()/5);
+    glutInitWindowSize(mainGame.getWidth(), mainGame.getHeight());
     glutCreateWindow("Territory Expansion Game");
     init();
     
     // register callbacks
     glutDisplayFunc(renderScene);
+    glutKeyboardFunc(normalKeys);
+    glutSpecialFunc(specialKeys);
+    glutIdleFunc(idleFunc);
+    glutReshapeFunc(reshapeFunc);
     
     // enter GLUT event processing cycle
     glutMainLoop();
