@@ -14,6 +14,8 @@ void idleFunc(){mainGame.idleFunc();}
 void reshapeFunc(int w, int h){mainGame.reshapeFunc(w, h);}
 
 int main(int argc, char** argv) {
+    srand(time(NULL));
+    
     // init GLUT and create Window
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);

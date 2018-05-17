@@ -46,7 +46,6 @@ private:
     }
     void setBgColor(float r, float g, float b){
         bgColorR = r; bgColorG = g; bgColorB = b;
-        
     }
     
 private:

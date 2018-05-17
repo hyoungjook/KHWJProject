@@ -23,7 +23,7 @@ void Game::renderScene(){
             drawString("Press Enter to Start", 0.0f, -0.4f, 0.05f, Color(0.0f, 1.0f, 0.0f));
             break;
         case PLAY_1P:
-            
+            territory->drawMap(0.03333333f, -1, 1);
             
             break;
     }
@@ -45,9 +45,16 @@ void Game::normalKeys(unsigned char key, int x, int y){
         case TITLE:
             switch(key){
                 case '\r': // ENTER
-                    setBgColor(1.0f, 0.0f, 1.0f);
+                    // PLAY_1P로 전환
+                    gameState = PLAY_1P;
+                    territory = new Territory(WIDTH/10, HEIGHT/10);
+                    territory->setPlayerTerritory(WIDTH/20-5, HEIGHT/20-5, WIDTH/20+5, HEIGHT/20+5);
+                    territory->setPlayerPosition(WIDTH/20, HEIGHT/20);
+                    territory->createZombies(10, 100);
+                    setBgColor(0, 0, 0);
                     glutPostRedisplay();
                     break;
+                    
             }
             
             break;
