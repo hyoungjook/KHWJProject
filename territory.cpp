@@ -258,6 +258,7 @@ void Territory::updateTerritory(){
         bdChk[i] = new bool[height];
         for(int j=0; j<height; j++){
             if(map[i][j] == true) bdChk[i][j] = true;
+            else bdChk[i][j] = false;
         }
     }
     
@@ -269,6 +270,7 @@ void Territory::updateTerritory(){
         BFSFill(0, j, bdChk);
         BFSFill(width-1, j, bdChk);
     }
+    
     
     for(int i=0; i<width; i++){
         for(int j=0; j<height; j++){
