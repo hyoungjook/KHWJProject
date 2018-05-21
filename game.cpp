@@ -1,12 +1,8 @@
 #include "game.hpp"
 
 Game::Game(int w, int h): WIDTH(w), HEIGHT(h){
-    titleText = Object("models/title.obj");
-    titleText.setMaterial(0, 0, 0, 1, // emission
-                          0.02, 0.17, 0.02, 1, // ambient
-                          0.07, 0.6, 0.07, 1, // diffuse
-                          0.63, 0.73, 0.63, 1, // specular
-                          76.8); // shininess
+    //titleText = Object("models/title.obj");
+    titleText = Object("models/untitled.obj");
 }
 Game::~Game(){
     
@@ -45,17 +41,17 @@ void Game::renderScene(){
                   0.0f, 1.0f, 0.0f);
         
         glPushMatrix();
-        glTranslatef(0, -0.5, -1);
-        glRotatef(2.0f * titleCubeAngle, 0, 1, 0);
-        glColor3f(0, 0, 0);
-        glutSolidCube(0.5);
-        glPopMatrix();
-        
-        glPushMatrix();
         glTranslatef(0, 0.2, 0);
         glRotatef(20.0f * sin(1.0f * titleCubeAngle), 1, 0, 0);
         glRotatef(20.0f * sin(0.5f * titleCubeAngle), 0, 1, 0);
         titleText.draw();
+        glPopMatrix();
+        
+        glPushMatrix();
+        glTranslatef(0, -0.5, -1);
+        glRotatef(2.0f * titleCubeAngle, 0, 1, 0);
+        glColor3f(0, 0, 0);
+        glutSolidCube(0.5);
         glPopMatrix();
         
     }

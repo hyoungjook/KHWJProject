@@ -63,6 +63,7 @@ private:
     float titleCubeAngle = 0.0f;
     Object titleText;
     
+    
 public:
     void renderScene();
     void normalKeys(unsigned char key, int x, int y);
