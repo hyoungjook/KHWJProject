@@ -4,7 +4,7 @@
 #include "game.hpp"
 
 
-const int WIDTH = 600, HEIGHT = 600;
+const int WIDTH = 800, HEIGHT = 600;
 Game mainGame(WIDTH, HEIGHT);
 
 void renderScene(){mainGame.renderScene();}
@@ -33,6 +33,6 @@ int main(int argc, char** argv) {
     
     // enter GLUT event processing cycle
     glutMainLoop();
-    
+   
     return 0;
 }

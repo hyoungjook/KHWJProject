@@ -2,6 +2,8 @@
 #define game_hpp
 
 #include <string>
+#include <time.h>
+#include <cmath>
 
 #ifdef _WIN32
 #include <GL/glut.h>
@@ -11,6 +13,7 @@
 
 #include "color.hpp"
 #include "territory.hpp"
+#include "object.hpp"
 
 #define BIG_FONT GLUT_BITMAP_TIMES_ROMAN_24
 #define SMALL_FONT GLUT_BITMAP_TIMES_ROMAN_10
@@ -53,6 +56,12 @@ private:
     GameState gameState;
     float bgColorR, bgColorG, bgColorB;
     Territory* territory;
+    float FPS = 60.0f;
+    clock_t startTimeForFPS = clock();
+    int idlePerTerritoryUpdateCount = 0;
+    const int idlePerTerritoryUpdate = 3;
+    float titleCubeAngle = 0.0f;
+    Object titleText;
     
 public:
     void renderScene();
