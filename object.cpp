@@ -5,6 +5,7 @@ Object::Object(std::string objFile){
     
     std::vector<vertex> v;
     std::vector<normal> n;
+    std::vector<texture> t;
     std::vector<std::tuple<std::string, material> > m;
     std::string line;
     bool matChanged = false;
@@ -67,6 +68,7 @@ Object::Object(std::string objFile){
                         nS
                     )));
             }
+            mtl.close();
         }
         else if(line.size() > 2 && line.substr(0,2).compare("v ") == 0){
             std::stringstream info(line.substr(2, line.size()));
@@ -80,6 +82,12 @@ Object::Object(std::string objFile){
             info >> x >> y >> z;
             n.push_back(normal(x, y, z));
         }
+        else if(line.size() > 3 && line.substr(0,3).compare("vt ") == 0){
+            std::stringstream info(line.substr(3, line.size()));
+            float x, y;
+            info >> x >> y;
+            t.push_back(texture(x, y));
+        }
         else if(line.size() > 2 && line.substr(0,2).compare("f ") == 0){
             std::stringstream info(line.substr(2, line.size()));
             face f;
@@ -89,8 +97,10 @@ Object::Object(std::string objFile){
                 unsigned long index_firstSlash = data.find('/');
                 int v_index = atoi(data.substr(0, index_firstSlash).c_str()) - 1;
                 unsigned long index_secondSlash = data.find('/', index_firstSlash + 1);
+                int t_index = atoi(data.substr(index_firstSlash+1, index_secondSlash).c_str()) - 1;
                 int n_index = atoi(data.substr(index_secondSlash+1, data.size()).c_str()) - 1;
                 f.vs.push_back(v[v_index]);
+                f.vts.push_back(t[t_index]);
                 f.vns.push_back(n[n_index]);
             }
             if(matChanged){
@@ -112,31 +122,73 @@ Object::Object(std::string objFile){
     }
     
     obj.close();
+    
+    std::ifstream texTxt(objFile+".txt");
+    
+    int value = 0;
+    for(int i=0; i<512*512*3; i++){
+        texTxt >> value;
+        texmap[i] = (unsigned char) value;
+    }
+    
+    texTxt.close();
+    
 }
 
 
 void Object::draw() {
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 512, 512, 0, GL_RGB, GL_UNSIGNED_BYTE, texmap);
+    glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     for(int i=0; i<faces.size(); i++) {
         if(faces[i].matChanged){
-            
             glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, faces[i].mat.emission);
             glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, faces[i].mat.diffuse);
             glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, faces[i].mat.specular);
             glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, faces[i].mat.ambient);
             glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, faces[i].mat.shininess);
-            /*
-            float mE[4] = {0, 0, 0, 1};
-            float mA[4] = {0, 0, 1};
-            float mD[4] = {0, 0, 0, 1};
-            float mS[4] = {0, 0, 0, 1};
-            float mSh[1] = {50};*/
+            
         }
         glBegin(GL_POLYGON);
         for (int j = 0; j < faces[i].vs.size(); j++) {
             glNormal3f(faces[i].vns[j].vec[0], faces[i].vns[j].vec[1], faces[i].vns[j].vec[2]);
+            glTexCoord2f(faces[i].vts[j].vec[0], faces[i].vts[j].vec[1]);
             glVertex3f(faces[i].vs[j].pos[0], faces[i].vs[j].pos[1], faces[i].vs[j].pos[2]);
         }
         
         glEnd();
     }
 }
+
+void Object::setTexMat(){
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 512, 512, 0, GL_RGB, GL_UNSIGNED_BYTE, texmap);
+    glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    
+    glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, faces[0].mat.emission);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, faces[0].mat.diffuse);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, faces[0].mat.specular);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, faces[0].mat.ambient);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, faces[0].mat.shininess);
+    
+}
+
+void Object::drawWOTexMat() {
+    for(int i=0; i<faces.size(); i++) {
+        glBegin(GL_POLYGON);
+        for (int j = 0; j < faces[i].vs.size(); j++) {
+            glNormal3f(faces[i].vns[j].vec[0], faces[i].vns[j].vec[1], faces[i].vns[j].vec[2]);
+            glTexCoord2f(faces[i].vts[j].vec[0], faces[i].vts[j].vec[1]);
+            glVertex3f(faces[i].vs[j].pos[0], faces[i].vs[j].pos[1], faces[i].vs[j].pos[2]);
+        }
+        
+        glEnd();
+    }
+}
+

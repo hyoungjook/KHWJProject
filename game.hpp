@@ -59,9 +59,11 @@ private:
     float FPS = 60.0f;
     clock_t startTimeForFPS = clock();
     int idlePerTerritoryUpdateCount = 0;
-    const int idlePerTerritoryUpdate = 3;
+    const int idlePerTerritoryUpdate = 10;
+    Direction tempPlayerDirection = STOP;
     float titleCubeAngle = 0.0f;
     Object titleText;
+    Object cell_on, cell_off, player, enemy;
     
     
 public:

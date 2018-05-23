@@ -6,6 +6,7 @@ Territory::Territory(int w, int h): width(w), height(h) {
         map[i] = new bool[height];
         for(int j=0; j<height; j++) map[i][j] = false;
     }
+    
 }
 Territory::~Territory(){
     if(map != nullptr){
@@ -64,7 +65,86 @@ void Territory::createZombies(int n, int maxSpeed){
     
 }
 
-void Territory::drawMap(float gluX, float gluY){
+void Territory::drawMap(float inter, Object& cell_on, Object& cell_off, Object &enemy, Object& player){
+    
+    // 맵
+    cell_off.setTexMat();
+    for(int i=0; i<width; i++){
+        for(int j=0; j<height; j++){
+            if(map[i][j] == false){
+                float x = 0.2f * (float)(i - width/2);
+                float z = 0.2f * (float)(j - height/2);
+                glPushMatrix();
+                glTranslatef(x, 0, z);
+                glRotatef(-90, 0, 1, 0);
+                cell_off.drawWOTexMat();
+                glPopMatrix();
+            }
+        }
+    }
+    cell_on.setTexMat();
+    for(int i=0; i<width; i++){
+        for(int j=0; j<height; j++){
+            if(map[i][j] == true){
+                float x = 0.2f * (float)(i - width/2);
+                float z = 0.2f * (float)(j - height/2);
+                glPushMatrix();
+                glTranslatef(x, 0, z);
+                glRotatef(-90, 0, 1, 0);
+                cell_on.drawWOTexMat();
+                glPopMatrix();
+            }
+        }
+    }
+    
+    // 좀비
+    enemy.setTexMat();
+    for(int i=0; i<zombies.size(); i++){
+        float x = 0.2f * (float)(zombies[i].getX() - width/2);
+        float z = 0.2f * (float)(zombies[i].getY() - height/2);
+        glPushMatrix();
+        glTranslatef(x, 0.1f, z);
+        glScalef(0.1f, 0.1f, 0.1f);
+        glRotatef(180, 0, 1, 0);
+        enemy.drawWOTexMat();
+        glPopMatrix();
+    }
+    
+    
+    // 흔적
+    player.setTexMat();
+    for(int i=0; i<trace.size(); i++){
+        float x = 0.2f * (float)(std::get<0>(trace[i]) - width/2);
+        float z = 0.2f * (float)(std::get<1>(trace[i]) - height/2);
+        glPushMatrix();
+        glTranslatef(x, 0.1f, z);
+        glScalef(0.05f, 0.05f, 0.05f);
+        glRotatef(180, 0, 1, 0);
+        player.drawWOTexMat();
+        glPopMatrix();
+    }
+    
+    
+    // 플레이어
+    {
+        float x = getPlayerGLUX(inter);
+        float z = getPlayerGLUZ(inter);
+        glPushMatrix();
+        glTranslatef(x, 0.1f, z);
+        glScalef(0.1f, 0.1f, 0.1f);
+        if(playerDirection == UP) glRotatef(-360.0f * inter, 1, 0, 0);
+        if(playerDirection == DOWN) glRotatef(360.0f * inter, 1, 0, 0);
+        if(playerDirection == LEFT) glRotatef(360.0f * inter, 0, 0, 1);
+        if(playerDirection == RIGHT) glRotatef(-360.0f * inter, 0, 0, 1);
+        glRotatef(180, 0, 1, 0);
+        player.drawWOTexMat();
+        glPopMatrix();
+    }
+    
+    
+    /*
+    float gluX = -1, gluY = 1;
+    
     float gluPerCellX = 2.0f / width, gluPerCellY = 2.0f / height;
     
     // 플레이어 영토
@@ -123,7 +203,7 @@ void Territory::drawMap(float gluX, float gluY){
         glVertex2f(x + gluPerCellX, y);
         glEnd();
     }
-    
+    */
     
 }
 
@@ -198,6 +278,12 @@ void Territory::update(){
     }
     
     if(isPlayerMoved){
+        // 경계 닿으면 멈춤
+        if(playerX == 0 || playerX == width-1 || playerY == 0 || playerY == height-1){
+            playerDirection = STOP;
+        }
+        
+        
         // 자기 trace에 닿았는지 체크
         for(int i=0; i<trace.size(); i++){
             if(playerX == std::get<0>(trace[i]) && playerY == std::get<1>(trace[i])){
@@ -215,7 +301,7 @@ void Territory::update(){
                 trace.clear();
                 
                 // 좀비 제거
-                for(int i=0; i<zombies.size(); i++){
+                for(int i=zombies.size()-1; i>=0; i--){
                     if(map[zombies[i].getX()][zombies[i].getY()] == true){
                         zombies.erase(zombies.begin() + i);
                     }

@@ -5,6 +5,7 @@
 #include <fstream>
 #include <sstream>
 #include <vector>
+#include <tuple>
 #ifdef _WIN32
 #include <GL/glut.h>
 #elif __APPLE__
@@ -26,6 +27,13 @@ public:
     float vec[3];
 };
 
+class texture{
+public:
+    texture(){}
+    texture(float x, float y){vec[0] = x; vec[1] = y;}
+    float vec[2];
+};
+
 class material {
 public:
     material(){}
@@ -44,6 +52,7 @@ public:
     face() {}
     std::vector<vertex> vs;
     std::vector<normal> vns;
+    std::vector<texture> vts;
     bool matChanged = false;
     material mat;
 };
@@ -53,9 +62,12 @@ public:
     Object(){}
     Object(std::string objFile);
     void draw();
+    void setTexMat();
+    void drawWOTexMat();
     
 private:
     std::vector<face> faces;
+    unsigned char texmap[512*512*3];
     
 };
 

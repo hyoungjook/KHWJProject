@@ -1,8 +1,11 @@
 #include "game.hpp"
 
 Game::Game(int w, int h): WIDTH(w), HEIGHT(h){
-    //titleText = Object("models/title.obj");
-    titleText = Object("models/untitled.obj");
+    titleText = Object("models/title.obj");
+    cell_on = Object("models/cell_on.obj");
+    cell_off = Object("models/cell_off.obj");
+    enemy = Object("models/enemy.obj");
+    player = Object("models/player.obj");
 }
 Game::~Game(){
     
@@ -29,6 +32,11 @@ void Game::renderScene(){
         glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
         glLightfv(GL_LIGHT0, GL_POSITION, light_position);
         glEnable(GL_LIGHT0);
+        // Texture
+        GLuint texID;
+        glEnable(GL_TEXTURE_2D);
+        glGenTextures(1, &texID);
+        glBindTexture(GL_TEXTURE_2D, texID);
         // Use the Projection Matrix
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
@@ -56,18 +64,52 @@ void Game::renderScene(){
         
     }
     else if(gameState == PLAY_1P){
+        /*
         // Lighting
         glDisable(GL_LIGHT0);
         glDisable(GL_DEPTH_TEST);
         glDisable(GL_LIGHTING);
+        // Texture
+        glDisable(GL_TEXTURE_2D);
         // Use the Projection Matrix
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
         // Reset transformations
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
+        */
         
-        territory->drawMap(-1, 1);
+        // Lighting
+        glEnable(GL_LIGHTING);
+        glEnable(GL_DEPTH_TEST);
+        float light_ambient[] = {1, 1, 1, 1};
+        float light_diffuse[] = {0.7, 0.7, 0.7, 1};
+        float light_specular[] = {0.5, 0.5, 0.5, 1};
+        float light_position[] = {1, 1, 1, 0};
+        glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
+        glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
+        glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
+        glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+        glEnable(GL_LIGHT0);
+        // Texture
+        GLuint texID;
+        glEnable(GL_TEXTURE_2D);
+        glGenTextures(1, &texID);
+        glBindTexture(GL_TEXTURE_2D, texID);
+        // Use the Projection Matrix
+        glMatrixMode(GL_PROJECTION);
+        glLoadIdentity();
+        gluPerspective(80.0f, ((float)WIDTH)/(float)HEIGHT, 0.1f, 100.0f);
+        // Reset transformations
+        glMatrixMode(GL_MODELVIEW);
+        glLoadIdentity();
+        float interAnimation = (float)idlePerTerritoryUpdateCount / idlePerTerritoryUpdate;
+        gluLookAt(territory->getPlayerGLUX(interAnimation), 1.5f, territory->getPlayerGLUZ(interAnimation) + 0.5f,
+                  territory->getPlayerGLUX(interAnimation), 0.0f, territory->getPlayerGLUZ(interAnimation),
+                  0.0f, 1.0f, 0.0f);
+        
+        //territory->drawMap(-1, 1);
+        territory->drawMap(interAnimation, cell_on, cell_off, enemy, player);
     }
     
     glutSwapBuffers();
@@ -94,7 +136,7 @@ void Game::normalKeys(unsigned char key, int x, int y){
                     territory->setPlayerTerritory(terrW/2-5, terrH/2-5, terrW/2+5, terrH/2+5);
                     territory->setPlayerPosition(terrW/2, terrH/2);
                     territory->createZombies(10, 100);
-                    setBgColor(0, 0, 0);
+                    setBgColor(1,1,1);
                     glutPostRedisplay();
                     break;
                     
@@ -118,16 +160,16 @@ void Game::specialKeys(int key, int x, int y){
         case PLAY_1P:
             switch(key){
                 case GLUT_KEY_UP:
-                    territory->setPlayerDirection(UP);
+                    tempPlayerDirection = UP;
                     break;
                 case GLUT_KEY_DOWN:
-                    territory->setPlayerDirection(DOWN);
+                    tempPlayerDirection = DOWN;
                     break;
                 case GLUT_KEY_LEFT:
-                    territory->setPlayerDirection(LEFT);
+                    tempPlayerDirection = LEFT;
                     break;
                 case GLUT_KEY_RIGHT:
-                    territory->setPlayerDirection(RIGHT);
+                    tempPlayerDirection = RIGHT;
                     break;
             }
             
@@ -149,6 +191,7 @@ void Game::idleFunc(){
             idlePerTerritoryUpdateCount++;
             if(idlePerTerritoryUpdateCount == idlePerTerritoryUpdate){
                 territory->update();
+                territory->setPlayerDirection(tempPlayerDirection);
                 idlePerTerritoryUpdateCount = 0;
             }
             break;

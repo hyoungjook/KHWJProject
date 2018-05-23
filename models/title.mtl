@@ -1,0 +1,13 @@
+# Blender MTL File: 'title.blend'
+# Material Count: 1
+
+newmtl Ground
+Ns 96.078431
+Ka 0.400000 0.400000 0.400000
+Kd 0.207842 0.058287 0.009076
+Ks 0.027517 0.005001 0.000481
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd depositphotos_36140269-stock-photo-soil-dirt-texture.jpg
